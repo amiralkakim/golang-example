@@ -2,6 +2,7 @@
 
 ##Project Layout Structure
 
+```
 .
 ├── go.mod
 |   # file go.mod dipergunakan oleh go module (jika go mod diaktifkan).
@@ -86,3 +87,4 @@
 |   # berisi aplikasi web. untuk microservices saya sarankan untuk menempatkan aplikasi web dalam folder `cmd/app`
 |
 └── ...
+```
