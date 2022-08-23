@@ -1,4 +1,3 @@
-
 module example
 
 go 1.18
@@ -17,7 +16,3 @@ require (
 	golang.org/x/sys v0.0.0-20211103235746-7861aae1554b // indirect
 	golang.org/x/text v0.3.6 // indirect
 )
-module echo
-
-go 1.18
-
