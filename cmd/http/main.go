@@ -1,41 +1,42 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo"
 )
 
 type User struct {
-	Name  string `json:"name" form:"name" query:"name"`
-	Email string `json:"email" form:"email" query:"email"`
+	Name  string `json:"name"  validate:"required"`
+	Email string `json:"email" validate:"required,email"`
+	Age   int    `json:"age"   validate:"gte=0,lte=80"`
+}
+
+type CustomValidator struct {
+	validator *validator.Validate
+}
+
+func (cv *CustomValidator) Validate(i interface{}) error {
+	return cv.validator.Struct(i)
 }
 
 func main() {
-	r := echo.New()
+	e := echo.New()
 
-	r.Any("/user", func(c echo.Context) (err error) {
+	e.Validator = &CustomValidator{validator: validator.New()}
+
+	e.POST("/users", func(c echo.Context) error {
 		u := new(User)
-		if err = c.Bind(u); err != nil {
-			return
+		if err := c.Bind(u); err != nil {
+			return err
+		}
+		if err := c.Validate(u); err != nil {
+			return err
 		}
 
-		return c.JSON(http.StatusOK, u)
+		return c.JSON(http.StatusOK, true)
 	})
 
-	// json payload
-	// curl -X POST http://localhost:9000/user -H 'Content-Type: application/json' -d '{"name":"Joe","email":"joe@novalagung.com"}'
-
-	// xml payload
-	// curl -X POST http://localhost:9000/user -H 'Content-Type: application/xml' -d '<?xml version="1.0"?><Data><Name>Joe</Name><Email>joe@novalagung.com</Email></Data>'
-
-	// form data
-	// curl -X POST http://localhost:9000/user -d 'name=Joe' -d 'email=joe@novalagung.com'
-
-	// query string
-	// curl -X GET http://localhost:9000/user?name=Joe&email=joe@novalagung.com
-
-	fmt.Println("server started at :9000")
-	r.Start(":9000")
+	e.Logger.Fatal(e.Start(":9000"))
 }
